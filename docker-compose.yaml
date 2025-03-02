@@ -1,0 +1,82 @@
+version: "3.8"
+services:
+  postgres:
+    image: bitnami/postgresql:latest
+    container_name: postgres-baso
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRESQL_USERNAME=baso
+      - POSTGRESQL_PASSWORD=baso_secret
+      - POSTGRESQL_DATABASE=baso-social
+    networks:
+      - social
+
+  redis:
+    image: redis:6.0
+    container_name: redis-baso
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-baso:/data
+    environment:
+      - REDIS_PASSWORD=baso_redis
+    networks:
+      - social
+    command: /bin/sh -c 'redis-server --appendonly yes --requirepass $$REDIS_PASSWORD'
+
+  nestjs:
+    build:
+      context: ./baso-social-nest # Đường dẫn đến thư mục chứa Dockerfile NestJS
+      dockerfile: Dockerfile # Tên Dockerfile NestJS
+    container_name: nestjs-baso
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=postgresql://baso:baso_secret@postgres-baso:5432/baso-social
+      - REDIS_HOST=redis-baso
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=baso_redis
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - social
+    command: ["/bin/sh", "-c", "npx prisma migrate deploy && npm run start:prod"]
+
+  nextjs:
+    build:
+      context: ./baso-social-next # Đường dẫn đến thư mục chứa Dockerfile Next.js
+      dockerfile: Dockerfile # Tên Dockerfile Next.js
+    container_name: nextjs-baso
+    restart: always
+    ports:
+      - "3001:3001"
+    depends_on:
+      - nestjs
+    networks:
+      - social
+
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    container_name: nginx-baso
+    ports:
+      - "80:80"
+    depends_on:
+      - nextjs
+      - nestjs
+    networks:
+      - social
+
+networks:
+  social:
+    driver: bridge
+
+volumes:
+  redis-baso:
+  certbot-data:
