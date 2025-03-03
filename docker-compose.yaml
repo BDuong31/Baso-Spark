@@ -55,47 +55,13 @@ services:
     restart: always
     ports:
       - "3001:3001"
-    environment:
-      - NEXT_PUBLIC_API_DOMAIN='https://basospark.youthscience.club/apis/'
-      - NEXTAUTH_URL='https://basospark.youthscience.club'
-      - GOOGLE_CLIENT_ID='697579782317-tjcpc3k2in99vskgkbgms4jsv1o8ro2l.apps.googleusercontent.com'
-      - GOOGLE_CLIENT_SECRET='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'
     depends_on:
       - nestjs
     networks:
       - social
-
-  nginx:
-    build:
-      context: ./nginx
-      dockerfile: Dockerfile
-    container_name: nginx-baso
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx/conf.d:/etc/nginx/conf.d
-      - ./certbot/conf:/etc/letsencrypt
-      - ./certbot/www:/var/www/certbot
-    restart: always
-    depends_on:
-      - nextjs
-      - nestjs
-      - certbot
-    networks:
-      - social
-
-  certbot:
-    image: certbot/certbot
-    container_name: certbot-baso
-    volumes:
-      - ./certbot/conf:/etc/letsencrypt
-      - ./certbot/www:/var/www/certbot
-    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do sleep 6h & wait $${!}; certbot renew; done'"
 
 networks:
   social:
-    driver: bridge
 
 volumes:
   redis-baso:
