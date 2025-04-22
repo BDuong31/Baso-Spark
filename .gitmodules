@@ -1,0 +1,6 @@
+[submodule "baso-social-nest"]
+	path = baso-social-nest
+	url = https://github.com/BDuong31/baso-social-nest.git
+[submodule "baso-social-next"]
+    path = baso-social-next
+    url = https://github.com/BDuong31/baso-social-next.git
