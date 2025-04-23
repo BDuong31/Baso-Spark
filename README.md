@@ -36,7 +36,7 @@ docker-compose up --build
 ```
 
 ### Bước 3: Truy cập ứng dụng
-- Sau khi các container được khởi động thành công, bạn có thể truy cập ứng dụng thông qua địa chỉ được chỉ định (ví dụ: `http://localhost:8000`).
+- Sau khi các container được khởi động thành công, bạn có thể truy cập ứng dụng qua https://localhost:3001 và truy cập vào documents API qua https://localhost:3000.
 
 ### Bước 4: Dừng container
 Để dừng các container, bạn có thể sử dụng lệnh:
